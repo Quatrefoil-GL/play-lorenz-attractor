@@ -162,28 +162,30 @@
             :args $ [] $ :: 'Map 'Tag 'Dynamic
         'gen-lorenz-seq $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defn gen-lorenz-seq (steps dt a b c scale)
-            apply-args
-                []
-                , 2 3 4 steps
-              fn (acc x y z n)
-                hint-fn $ {}
-                  :args $ []
-                    :: 'List $ :: 'List 'Number
-                    , 'Number 'Number 'Number 'Number
-                  :return $ :: 'List $ :: 'List 'Number
-                ; println |trace x y z n
-                if (&<= n 0) acc $ let
-                    dx $ &* dt $ &* a (&- y x)
-                    dy $ &* dt $ &-
-                      &* x $ &- b z
-                      , y
-                    dz $ &* dt $ &- (&* x y) (&* c z)
-                  recur
-                    conj acc $ [] (&* x scale) (&* y scale) (&* z scale)
-                    &+ x dx
-                    &+ y dy
-                    &+ z dz
-                    dec n
+            loop
+                acc $ []
+                x 2
+                y 3
+                z 4
+                n steps
+              hint-fn $ {}
+                :args $ []
+                  :: 'List $ :: 'List 'Number
+                  , 'Number 'Number 'Number 'Number
+                :return $ :: 'List $ :: 'List 'Number
+              ; println |trace x y z n
+              if (&<= n 0) acc $ let
+                  dx $ &* dt $ &* a (&- y x)
+                  dy $ &* dt $ &-
+                    &* x $ &- b z
+                    , y
+                  dz $ &* dt $ &- (&* x y) (&* c z)
+                recur
+                  conj acc $ [] (&* x scale) (&* y scale) (&* z scale)
+                  &+ x dx
+                  &+ y dy
+                  &+ z dz
+                  dec n
           :examples $ []
           :schema $ :: 'Fn $ {}
             :args $ [] 'Number 'Number 'Number 'Number 'Number 'Number
@@ -257,7 +259,7 @@
     'app.main $ %{} 'FileEntry
       :defs $ {}
         '*store $ %{} 'CodeEntry (:doc |)
-          :code $ quote $ defatom *store
+          :code $ quote $ defref *store
             {} $ :states $ {}
               :cursor $ []
           :examples $ []
@@ -358,7 +360,9 @@
       :defs $ {} $ 'updater
         %{} 'CodeEntry (:doc |)
           :code $ quote $ defn updater (store op op-data)
-            case-default op store $ :states $ update-states store op-data
+            match op
+              :states $ update-states store op-data
+              _ store
           :examples $ []
           :schema $ :: 'Fn $ {}
             :args $ [] (:: 'Map 'Tag 'Dynamic) 'Tag 'Dynamic
