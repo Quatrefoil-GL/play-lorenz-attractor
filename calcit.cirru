@@ -21,20 +21,35 @@
           :code $ quote $ defcomp comp-lorenz-attractor (states)
             let
                 cursor $ quatrefoil.util.core/require-decoded $ try-decode-map-as
-                  option:unwrap $ get states :cursor
+                    get states :cursor
+                    , .unwrap
                   :: 'List 'Tag
                 state $ quatrefoil.util.core/require-decoded $ try-decode-map-as
                   or
-                    option:unwrap-or (get states :data) nil
+                    match (get states :data)
+                      (:some found) found
+                      (:none) nil
                     {} (:a 10) (:b 28) (:size 600000) (:unit 0.006) (:scale 4)
                       :c $ / 8 3
                   :: 'Map 'Tag 'Number
-                a $ option:unwrap $ get state :a
-                b $ option:unwrap $ get state :b
-                c $ option:unwrap $ get state :c
-                size $ option:unwrap $ get state :size
-                unit $ option:unwrap $ get state :unit
-                scale $ option:unwrap $ get state :scale
+                a $
+                  get state :a
+                  , .unwrap
+                b $
+                  get state :b
+                  , .unwrap
+                c $
+                  get state :c
+                  , .unwrap
+                size $
+                  get state :size
+                  , .unwrap
+                unit $
+                  get state :unit
+                  , .unwrap
+                scale $
+                  get state :scale
+                  , .unwrap
               group ({})
                 let
                     n 8
@@ -48,7 +63,9 @@
                       line $ {} (:points segment)
                         :position $ [] 0 0 0
                         :material $ {} (:kind :line-basic)
-                          :color $ option:unwrap-or (nth color-scheme idx) 0xffffff
+                          :color $
+                            nth color-scheme idx
+                            , .unwrap-or 0xffffff
                           :opacity 1
                           ; :transparent true
                           :linewidth 1
@@ -145,28 +162,30 @@
             :args $ [] $ :: 'Map 'Tag 'Dynamic
         'gen-lorenz-seq $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defn gen-lorenz-seq (steps dt a b c scale)
-            apply-args
-                []
-                , 2 3 4 steps
-              fn (acc x y z n)
-                hint-fn $ {}
-                  :args $ []
-                    :: 'List $ :: 'List 'Number
-                    , 'Number 'Number 'Number 'Number
-                  :return $ :: 'List $ :: 'List 'Number
-                ; println |trace x y z n
-                if (&<= n 0) acc $ let
-                    dx $ &* dt $ &* a (&- y x)
-                    dy $ &* dt $ &-
-                      &* x $ &- b z
-                      , y
-                    dz $ &* dt $ &- (&* x y) (&* c z)
-                  recur
-                    conj acc $ [] (&* x scale) (&* y scale) (&* z scale)
-                    &+ x dx
-                    &+ y dy
-                    &+ z dz
-                    dec n
+            loop
+                acc $ []
+                x 2
+                y 3
+                z 4
+                n steps
+              hint-fn $ {}
+                :args $ []
+                  :: 'List $ :: 'List 'Number
+                  , 'Number 'Number 'Number 'Number
+                :return $ :: 'List $ :: 'List 'Number
+              ; println |trace x y z n
+              if (&<= n 0) acc $ let
+                  dx $ &* dt $ &* a (&- y x)
+                  dy $ &* dt $ &-
+                    &* x $ &- b z
+                    , y
+                  dz $ &* dt $ &- (&* x y) (&* c z)
+                recur
+                  conj acc $ [] (&* x scale) (&* y scale) (&* z scale)
+                  &+ x dx
+                  &+ y dy
+                  &+ z dz
+                  dec n
           :examples $ []
           :schema $ :: 'Fn $ {}
             :args $ [] 'Number 'Number 'Number 'Number 'Number 'Number
@@ -213,7 +232,8 @@
           :code $ quote $ defcomp comp-container (store)
             let
                 states $ quatrefoil.util.core/require-decoded $ try-decode-map-as
-                  option:unwrap $ get store :states
+                    get store :states
+                    , .unwrap
                   :: 'Map 'Tag 'Dynamic
                 scaled 0.002
               scene ({})
@@ -239,7 +259,7 @@
     'app.main $ %{} 'FileEntry
       :defs $ {}
         '*store $ %{} 'CodeEntry (:doc |)
-          :code $ quote $ defatom *store
+          :code $ quote $ defref *store
             {} $ :states $ {}
               :cursor $ []
           :examples $ []
@@ -329,9 +349,9 @@
             |@quatrefoil/utils :refer $ inject-tree-methods
             quatrefoil.core :refer $ render-canvas! *global-tree clear-cache! init-renderer! init-controls! handle-key-event handle-control-events
             app.comp.container :refer $ comp-container
-            app.updater :refer $ [] updater
+            app.updater :refer $ updater
             |three :as THREE
-            touch-control.core :refer $ render-control! control-states start-control-loop! clear-control-loop!
+            touch-control.core :refer $ render-control! start-control-loop! clear-control-loop!
             |mobile-detect :default mobile-detect
             |bottom-tip :default hud!
             |./calcit.build-errors :default build-errors
@@ -340,7 +360,9 @@
       :defs $ {} $ 'updater
         %{} 'CodeEntry (:doc |)
           :code $ quote $ defn updater (store op op-data)
-            case-default op store $ :states $ update-states store op-data
+            match op
+              :states $ update-states store op-data
+              _ store
           :examples $ []
           :schema $ :: 'Fn $ {}
             :args $ [] (:: 'Map 'Tag 'Dynamic) 'Tag 'Dynamic
