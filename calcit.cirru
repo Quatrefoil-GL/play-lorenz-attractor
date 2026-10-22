@@ -160,72 +160,13 @@
           :examples $ []
           :schema $ :: 'Fn $ {} (:return 'quatrefoil.schema/Component)
             :args $ [] $ :: 'Map 'Tag 'Dynamic
-        'gen-lorenz-seq $ %{} 'CodeEntry (:doc |)
-          :code $ quote $ defn gen-lorenz-seq (steps dt a b c scale)
-            loop
-                acc $ []
-                x 2
-                y 3
-                z 4
-                n steps
-              hint-fn $ {}
-                :args $ []
-                  :: 'List $ :: 'List 'Number
-                  , 'Number 'Number 'Number 'Number
-                :return $ :: 'List $ :: 'List 'Number
-              ; println |trace x y z n
-              if (&<= n 0) acc $ let
-                  dx $ &* dt $ &* a (&- y x)
-                  dy $ &* dt $ &-
-                    &* x $ &- b z
-                    , y
-                  dz $ &* dt $ &- (&* x y) (&* c z)
-                recur
-                  conj acc $ [] (&* x scale) (&* y scale) (&* z scale)
-                  &+ x dx
-                  &+ y dy
-                  &+ z dz
-                  dec n
-          :examples $ []
-          :schema $ :: 'Fn $ {}
-            :args $ [] 'Number 'Number 'Number 'Number 'Number 'Number
-            :return $ :: 'List $ :: 'List 'Number
-        'initial-config $ %{} 'CodeEntry (:doc |)
-          :code $ quote $ def initial-config
-            {} (:a 10) (:b 28)
-              :c $ / 8 3
-              :size 3000
-              :unit 0.006
-              :scale 1
-          :examples $ []
-          :schema $ :: 'Map 'Tag 'Number
-        'split-segments $ %{} 'CodeEntry (:doc |)
-          :code $ quote $ defn split-segments (points n)
-            let
-                size $ count points
-                unit $ floor $ / size n
-              -> (range n)
-                map $ fn (idx)
-                  hint-fn $ {}
-                    :args $ [] 'Number
-                    :return $ :: 'List $ :: 'List 'Number
-                  if
-                    = (inc idx) n
-                    slice points (* idx unit) size
-                    slice points (* idx unit)
-                      * (inc idx) unit
-          :examples $ []
-          :schema $ :: 'Fn $ {}
-            :args $ []
-              :: 'List $ :: 'List 'Number
-              , 'Number
-            :return $ :: 'List $ :: 'List (:: 'List 'Number)
       :ns $ %{} 'NsEntry (:doc |)
         :code $ quote $ ns app.como.lorenz-attractor
           :require
             quatrefoil.alias :refer $ group sphere line ambient-light point-light
             quatrefoil.core :refer $ defcomp hslx
             quatrefoil.comp.control :refer $ comp-value
+            app.math :refer $ gen-lorenz-seq split-segments initial-config
     'app.comp.container $ %{} 'FileEntry
       :defs $ {} $ 'comp-container
         %{} 'CodeEntry (:doc |)
@@ -356,6 +297,89 @@
             |bottom-tip :default hud!
             |./calcit.build-errors :default build-errors
             quatrefoil.dsl.object3d-dom :refer $ set-perspective-camera!
+    'app.math $ %{} 'FileEntry
+      :defs $ {}
+        'gen-lorenz-seq $ %{} 'CodeEntry (:doc |)
+          :code $ quote $ defn gen-lorenz-seq (steps dt a b c scale)
+            loop
+                acc $ []
+                x 2
+                y 3
+                z 4
+                n steps
+              hint-fn $ {}
+                :args $ []
+                  :: 'List $ :: 'List 'Number
+                  , 'Number 'Number 'Number 'Number
+                :return $ :: 'List $ :: 'List 'Number
+              ; println |trace x y z n
+              if (&<= n 0) acc $ let
+                  dx $ &* dt $ &* a (&- y x)
+                  dy $ &* dt $ &-
+                    &* x $ &- b z
+                    , y
+                  dz $ &* dt $ &- (&* x y) (&* c z)
+                recur
+                  conj acc $ [] (&* x scale) (&* y scale) (&* z scale)
+                  &+ x dx
+                  &+ y dy
+                  &+ z dz
+                  dec n
+          :examples $ []
+          :schema $ :: 'Fn $ {}
+            :args $ [] 'Number 'Number 'Number 'Number 'Number 'Number
+            :return $ :: 'List $ :: 'List 'Number
+          :tests $ [] $ %{} 'TestEntry (:name |preserve-euler-segments-and-default-count)
+            :code $ quote $ do
+              assert=
+                [] $ [] 8 12 16
+                gen-lorenz-seq 1 0.006 10 28 (/ 8 3) 4
+              assert=
+                [] ([] 8 12 16) ([] 8.24 13.08 15.888)
+                gen-lorenz-seq 2 0.006 10 28 (/ 8 3) 4
+              assert= 600000 $ count $ gen-lorenz-seq 600000 0.006 10 28 (/ 8 3) 4
+              assert=
+                []
+                  [] ([] 1) ([] 2)
+                  [] ([] 3) ([] 4) ([] 5)
+                split-segments
+                  [] ([] 1) ([] 2) ([] 3) ([] 4) ([] 5)
+                  , 2
+              assert= 3000 $
+                get initial-config :size
+                , .unwrap
+        'initial-config $ %{} 'CodeEntry (:doc |)
+          :code $ quote $ def initial-config
+            {} (:a 10) (:b 28)
+              :c $ / 8 3
+              :size 3000
+              :unit 0.006
+              :scale 1
+          :examples $ []
+          :schema $ :: 'Map 'Tag 'Number
+        'split-segments $ %{} 'CodeEntry (:doc |)
+          :code $ quote $ defn split-segments (points n)
+            let
+                size $ count points
+                unit $ floor $ / size n
+              -> (range n)
+                map $ fn (idx)
+                  hint-fn $ {}
+                    :args $ [] 'Number
+                    :return $ :: 'List $ :: 'List 'Number
+                  if
+                    = (inc idx) n
+                    slice points (* idx unit) size
+                    slice points (* idx unit)
+                      * (inc idx) unit
+          :examples $ []
+          :schema $ :: 'Fn $ {}
+            :args $ []
+              :: 'List $ :: 'List 'Number
+              , 'Number
+            :return $ :: 'List $ :: 'List (:: 'List 'Number)
+      :ns $ %{} 'NsEntry (:doc |)
+        :code $ quote $ ns app.math
     'app.updater $ %{} 'FileEntry
       :defs $ {} $ 'updater
         %{} 'CodeEntry (:doc |)
