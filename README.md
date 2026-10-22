@@ -58,7 +58,8 @@ Touch Control 0.0.32、Pointed Prompt 0.0.20；传递 JS FFI 为 0.2.5。
 Euler 方程、初始坐标、原 600000 点默认值、相机、分段和重置参数未改；
 `hud!` 的页面报错与成功提示也保留，没有改成 `raise`。
 
-原临时数学回放收为 `gen-lorenz-seq` 的一个定义附着测试，包含五个断言：
+纯数学函数与重置常量移至 `app.math`，与浏览器绘图库的导入隔离，函数体不变。
+原临时数学回放收为 `app.math/gen-lorenz-seq` 的一个定义附着测试，包含五个断言：
 首步缩放、第二步 Euler 数值、完整 600000 点数量、奇数分段尾部和重置 size。
 CI 复用 Calcit 0.30.1 已发布的 runner，在 native/JS 执行同一份测试，
 不另建验证脚本或框架；完整 strict 的失败状态/诊断会使 CI 失败。
