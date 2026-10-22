@@ -14,7 +14,7 @@ https://github.com/Quatrefoil-GL/quatrefoil-workflow
 
 ### Development and migration
 
-Use Calcit/procs 0.30.0, Caps 0.1.1, Node 24 and Yarn 4.18.0. Dependencies use
+Use Calcit/procs 0.30.1, Caps 0.1.1, Node 24 and Yarn 4.18.0. Dependencies use
 published module tags, strict Caps resolution and immutable Yarn installation.
 Maintain calcit.cirru/deps.cirru; generated js-out is ignored. The old editor
 source and retired compact.cirru remain recoverable from Git history.
@@ -52,14 +52,18 @@ declaring deployment acceptance; local build results alone are insufficient.
 
 ### 本轮使用者影响
 
-采用正式 Quatrefoil 0.1.8、Quaternion 0.2.14、Touch Control 0.0.31、
-Pointed Prompt 0.0.19 与传递 JS FFI 0.2.3。10 处旧 Option helper 改为
-公开方法或显式 some/none 分支；nil、缺失、默认值和字段检查行为保留。
-Euler 方程、初始坐标、原 600000 点默认值、分段和重置参数未改。
-完整 strict、原数学函数在旧/新正式图上的 native 回放、构建和默认浏览器启动
-均通过；本轮未重做移动设备参数拖动，不拿旧验证当作当前交互验收。
-正式 0.30.1 尚未发布，届时仍须配对升级。COS 仅用 action 内建校验，
-未增加脚本、测试框架或编译器规则；原生产路径不变。
+配对升级正式 Calcit/procs 0.30.1、Quatrefoil 0.1.10、Quaternion 0.2.16、
+Touch Control 0.0.32、Pointed Prompt 0.0.20；传递 JS FFI 为 0.2.5。
+上轮迁移的公开 Option 方法和显式 some/none 分支保留。
+Euler 方程、初始坐标、原 600000 点默认值、相机、分段和重置参数未改；
+`hud!` 的页面报错与成功提示也保留，没有改成 `raise`。
+
+原临时数学回放收为 `gen-lorenz-seq` 的一个定义附着测试，包含五个断言：
+首步缩放、第二步 Euler 数值、完整 600000 点数量、奇数分段尾部和重置 size。
+CI 复用 Calcit 0.30.1 已发布的 runner，在 native/JS 执行同一份测试，
+不另建验证脚本或框架；完整 strict 的失败状态/诊断会使 CI 失败。
+测试不代表 VR/gamepad、移动硬件性能或移动端参数拖动已经重新验收。
+COS 仅用 action 内建校验；PR 上传隔离前缀，原生产路径不变。
 
 ### License
 

@@ -190,6 +190,25 @@
           :schema $ :: 'Fn $ {}
             :args $ [] 'Number 'Number 'Number 'Number 'Number 'Number
             :return $ :: 'List $ :: 'List 'Number
+          :tests $ [] $ %{} 'TestEntry (:name |preserve-euler-segments-and-default-count)
+            :code $ quote $ do
+              assert=
+                [] $ [] 8 12 16
+                gen-lorenz-seq 1 0.006 10 28 (/ 8 3) 4
+              assert=
+                [] ([] 8 12 16) ([] 8.24 13.08 15.888)
+                gen-lorenz-seq 2 0.006 10 28 (/ 8 3) 4
+              assert= 600000 $ count $ gen-lorenz-seq 600000 0.006 10 28 (/ 8 3) 4
+              assert=
+                []
+                  [] ([] 1) ([] 2)
+                  [] ([] 3) ([] 4) ([] 5)
+                split-segments
+                  [] ([] 1) ([] 2) ([] 3) ([] 4) ([] 5)
+                  , 2
+              assert= 3000 $
+                get initial-config :size
+                , .unwrap
         'initial-config $ %{} 'CodeEntry (:doc |)
           :code $ quote $ def initial-config
             {} (:a 10) (:b 28)
