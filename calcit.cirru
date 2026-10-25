@@ -337,7 +337,7 @@
               assert=
                 [] ([] 8 12 16) ([] 8.24 13.08 15.888)
                 gen-lorenz-seq 2 0.006 10 28 (/ 8 3) 4
-              assert= 600000 $ count $ gen-lorenz-seq 600000 0.006 10 28 (/ 8 3) 4
+              assert= 600000 $ .len $ gen-lorenz-seq 600000 0.006 10 28 (/ 8 3) 4
               assert=
                 []
                   [] ([] 1) ([] 2)
@@ -360,7 +360,7 @@
         'split-segments $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defn split-segments (points n)
             let
-                size $ count points
+                size $ .len points
                 unit $ floor $ / size n
               -> (range n)
                 map $ fn (idx)
