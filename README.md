@@ -66,6 +66,16 @@ CI 复用 Calcit 0.30.1 已发布的 runner，在 native/JS 执行同一份测�
 测试不代表 VR/gamepad、移动硬件性能或移动端参数拖动已经重新验收。
 COS 仅用 action 内建校验；PR 上传隔离前缀，原生产路径不变。
 
+### List 长度写法整理
+
+`split-segments` 的已声明 List 参数，以及原附带测试中 `gen-lorenz-seq`
+返回的 List，改用首选 `.len`。仅替换这两处计数调用头；Euler 公式、
+分段尾部、600000 点默认值、原五项断言、类型合同和 `hud!` 均保留。
+正式 Calcit/procs 0.30.1、模块版本、lock、质量门禁及部署路径不变。
+官方 Linux 准备 CI 在改写前后执行相同的完整 strict、原 native/JS 测试和构建，
+均通过；61 个生成 JS 文件的路径及逐文件 SHA256 完全一致。
+临时迁移脚本不进入项目，不代表新增 WebGL、VR、移动设备或性能验收。
+
 ### License
 
 MIT
