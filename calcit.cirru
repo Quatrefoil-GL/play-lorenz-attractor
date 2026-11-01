@@ -16,7 +16,7 @@
               quatrefoil.core/js-number $ hslx 240 100 60
               quatrefoil.core/js-number $ hslx 30 100 50
           :examples $ []
-          :schema $ :: 'List 'Number
+          :schema $ quote $ List Number
         'comp-lorenz-attractor $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defcomp comp-lorenz-attractor (states)
             let
@@ -57,9 +57,9 @@
                     segments $ split-segments points 2
                   group ({}) & $ -> segments $ map-indexed
                     fn (idx segment)
-                      hint-fn $ {}
-                        :args $ [] 'Number $ :: 'List (:: 'List 'Number)
-                        :return 'quatrefoil.schema/Shape
+                      hint-fn $ Fn Number
+                        List $ List Number
+                        -> quatrefoil.schema/Shape
                       line $ {} (:points segment)
                         :position $ [] 0 0 0
                         :material $ {} (:kind :line-basic)
@@ -75,91 +75,69 @@
                       :position $ [] 10 20 160
                       :bound $ [] 10 800000
                     fn (v d!)
-                      hint-fn $ {}
-                        :args $ [] 'Number $ :: 'Fn
-                          {}
-                            :args $ [] 'Dynamic 'Dynamic
-                            :return 'Unit
-                        :return 'Unit
+                      hint-fn $ Fn Number
+                        Fn Dynamic Dynamic $ -> Unit
+                        -> Unit
                       d! cursor $ assoc state :size v
                   comp-value
                     {} (:radius 1) (:speed 0.0001) (:color 0xffaa99) (:show-text? true) (:opacity 0.8) (:label |unit) (:fract-length 5) (:value unit)
                       :position $ [] 10 15 160
                       :bound $ [] 0.00001 1
                     fn (v d!)
-                      hint-fn $ {}
-                        :args $ [] 'Number $ :: 'Fn
-                          {}
-                            :args $ [] 'Dynamic 'Dynamic
-                            :return 'Unit
-                        :return 'Unit
+                      hint-fn $ Fn Number
+                        Fn Dynamic Dynamic $ -> Unit
+                        -> Unit
                       d! cursor $ assoc state :unit v
                   comp-value
                     {} (:radius 1) (:speed 0.1) (:color 0xec8afa) (:show-text? true) (:opacity 0.8) (:label |scale) (:fract-length 5) (:value scale)
                       :position $ [] 10 10 160
                       :bound $ [] 0.1 10
                     fn (v d!)
-                      hint-fn $ {}
-                        :args $ [] 'Number $ :: 'Fn
-                          {}
-                            :args $ [] 'Dynamic 'Dynamic
-                            :return 'Unit
-                        :return 'Unit
+                      hint-fn $ Fn Number
+                        Fn Dynamic Dynamic $ -> Unit
+                        -> Unit
                       d! cursor $ assoc state :scale v
                   comp-value
                     {} (:radius 1) (:speed 0.5) (:color 0xaaaaff) (:show-text? true) (:opacity 0.8) (:label |a) (:fract-length 5) (:value a)
                       :position $ [] 20 5 160
                       :bound $ [] -100 100
                     fn (v d!)
-                      hint-fn $ {}
-                        :args $ [] 'Number $ :: 'Fn
-                          {}
-                            :args $ [] 'Dynamic 'Dynamic
-                            :return 'Unit
-                        :return 'Unit
+                      hint-fn $ Fn Number
+                        Fn Dynamic Dynamic $ -> Unit
+                        -> Unit
                       d! cursor $ assoc state :a v
                   comp-value
                     {} (:radius 1) (:speed 0.5) (:color 0xaaaaff) (:show-text? true) (:opacity 0.8) (:label |b) (:fract-length 5) (:value b)
                       :position $ [] 20 0 160
                       :bound $ [] -100 100
                     fn (v d!)
-                      hint-fn $ {}
-                        :args $ [] 'Number $ :: 'Fn
-                          {}
-                            :args $ [] 'Dynamic 'Dynamic
-                            :return 'Unit
-                        :return 'Unit
+                      hint-fn $ Fn Number
+                        Fn Dynamic Dynamic $ -> Unit
+                        -> Unit
                       d! cursor $ assoc state :b v
                   comp-value
                     {} (:radius 1) (:speed 0.5) (:color 0xaaaaff) (:show-text? true) (:opacity 0.8) (:label |c) (:fract-length 5) (:value c)
                       :position $ [] 20 -5 160
                       :bound $ [] -100 100
                     fn (v d!)
-                      hint-fn $ {}
-                        :args $ [] 'Number $ :: 'Fn
-                          {}
-                            :args $ [] 'Dynamic 'Dynamic
-                            :return 'Unit
-                        :return 'Unit
+                      hint-fn $ Fn Number
+                        Fn Dynamic Dynamic $ -> Unit
+                        -> Unit
                       d! cursor $ assoc state :c v
                   sphere $ {} (:radius 1) (:emissive 0xffffff) (:color 0xff0000) (:emissiveIntensity 1)
                     :position $ [] 50 4 160
                     :material $ {} (:kind :mesh-basic) (:color 0xff0000) (:opacity 1) (:transparent true)
                     :event $ {} $ :click
                       fn (e d!)
-                        hint-fn $ {}
-                          :args $ [] 'Dynamic $ :: 'Fn
-                            {}
-                              :args $ [] 'Dynamic 'Dynamic
-                              :return 'Unit
-                          :return 'Unit
+                        hint-fn $ Fn Dynamic
+                          Fn Dynamic Dynamic $ -> Unit
+                          -> Unit
                         d! cursor $ merge state initial-config
                 ambient-light $ {} $ :color 0x444422
                 point-light $ {} (:color 0xffffff) (:intensity 2) (:distance 200)
                   :position $ [] 0 60 0
           :examples $ []
-          :schema $ :: 'Fn $ {} (:return 'quatrefoil.schema/Component)
-            :args $ [] $ :: 'Map 'Tag 'Dynamic
+          :schema $ quote $ Fn (Map Tag Dynamic) (-> quatrefoil.schema/Component)
       :ns $ %{} 'NsEntry (:doc |)
         :code $ quote $ ns app.como.lorenz-attractor
           :require
@@ -189,8 +167,7 @@
                   ; point-light $ {} (:color 0xffffff) (:intensity 2) (:distance 200)
                     :position $ [] 0 60 0
           :examples $ []
-          :schema $ :: 'Fn $ {} (:return 'quatrefoil.schema/Component)
-            :args $ [] $ :: 'Map 'Tag 'Dynamic
+          :schema $ quote $ Fn (Map Tag Dynamic) (-> quatrefoil.schema/Component)
       :ns $ %{} 'NsEntry (:doc |)
         :code $ quote $ ns app.comp.container
           :require
@@ -204,16 +181,15 @@
             {} $ :states $ {}
               :cursor $ []
           :examples $ []
-          :schema $ :: 'Ref $ :: 'Map 'Tag 'Dynamic
+          :schema $ quote $ Ref (Map Tag Dynamic)
         'MobileDetectorHost $ %{} 'CodeEntry (:doc |)
           :code $ quote $ deftrait MobileDetectorHost
-            .mobile $ :: 'Fn $ {}
-              :args $ [] 'app.main/MobileDetectorHost
-              :return $ :: 'JsNullish 'JsObject
-              :features $ #{} :js-ffi
+            .mobile $ quote $ Fn app.main/MobileDetectorHost
+              -> $ JsNullish JsObject
+              :features :js-ffi
           :examples $ []
           :ffi $ {} (:backend :js) (:kind :external-object) (:target :browser)
-          :schema $ :: 'Trait
+          :schema $ quote Trait
         'dispatch! $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defn dispatch! (op op-data)
             if (list? op)
@@ -226,8 +202,7 @@
                 reset! *store store
                 , &unit
           :examples $ []
-          :schema $ :: 'Fn $ {} (:return 'Unit)
-            :args $ [] 'Dynamic 'Dynamic
+          :schema $ quote $ Fn Dynamic Dynamic (-> Unit)
         'main! $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defn main! () (load-console-formatter!) (inject-tree-methods)
             set-perspective-camera! $ {} (:fov 45) (:near 0.1) (:far 1000)
@@ -247,18 +222,14 @@
             println "|App started!"
             , &unit
           :examples $ []
-          :schema $ :: 'Fn $ {} (:return 'Unit)
-            :args $ []
-            :features $ #{} :js-ffi
+          :schema $ quote $ Fn (-> Unit) (:features :js-ffi)
         'mobile? $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defn mobile? (user-agent)
             let
                 detector $ js-cast (new mobile-detect user-agent) 'app.main/MobileDetectorHost
               js-present? $ .!mobile detector
           :examples $ []
-          :schema $ :: 'Fn $ {} (:return 'Bool)
-            :args $ [] 'String
-            :features $ #{} :js-ffi
+          :schema $ quote $ Fn String (-> Bool) (:features :js-ffi)
         'reload! $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defn reload! ()
             if (non-nil? build-errors) (hud! |error build-errors)
@@ -274,16 +245,12 @@
                 println "|Code updated."
             , &unit
           :examples $ []
-          :schema $ :: 'Fn $ {} (:return 'Unit)
-            :args $ []
-            :features $ #{} :js-ffi
+          :schema $ quote $ Fn (-> Unit) (:features :js-ffi)
         'render-app! $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defn render-app! () (; println "|Render app:")
             render-canvas! (comp-container @*store) dispatch!
           :examples $ []
-          :schema $ :: 'Fn $ {} (:return 'Unit)
-            :args $ []
-            :features $ #{} :js-ffi
+          :schema $ quote $ Fn (-> Unit) (:features :js-ffi)
       :ns $ %{} 'NsEntry (:doc |)
         :code $ quote $ ns app.main
           :require
@@ -307,11 +274,10 @@
                 y 3
                 z 4
                 n steps
-              hint-fn $ {}
-                :args $ []
-                  :: 'List $ :: 'List 'Number
-                  , 'Number 'Number 'Number 'Number
-                :return $ :: 'List $ :: 'List 'Number
+              hint-fn $ Fn
+                List $ List Number
+                , Number Number Number Number $ ->
+                  List $ List Number
               ; println |trace x y z n
               if (&<= n 0) acc $ let
                   dx $ &* dt $ &* a (&- y x)
@@ -326,9 +292,8 @@
                   &+ z dz
                   dec n
           :examples $ []
-          :schema $ :: 'Fn $ {}
-            :args $ [] 'Number 'Number 'Number 'Number 'Number 'Number
-            :return $ :: 'List $ :: 'List 'Number
+          :schema $ quote $ Fn Number Number Number Number Number Number
+            -> $ List $ List Number
           :tests $ [] $ %{} 'TestEntry (:name |preserve-euler-segments-and-default-count)
             :code $ quote $ do
               assert=
@@ -356,7 +321,7 @@
               :unit 0.006
               :scale 1
           :examples $ []
-          :schema $ :: 'Map 'Tag 'Number
+          :schema $ quote $ Map Tag Number
         'split-segments $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defn split-segments (points n)
             let
@@ -364,20 +329,18 @@
                 unit $ floor $ / size n
               -> (range n)
                 map $ fn (idx)
-                  hint-fn $ {}
-                    :args $ [] 'Number
-                    :return $ :: 'List $ :: 'List 'Number
+                  hint-fn $ Fn Number $ ->
+                    List $ List Number
                   if
                     = (inc idx) n
-                    slice points (* idx unit) size
+                    slice points (* idx unit) (Option :some size)
                     slice points (* idx unit)
-                      * (inc idx) unit
+                      Option :some $ * (inc idx) unit
           :examples $ []
-          :schema $ :: 'Fn $ {}
-            :args $ []
-              :: 'List $ :: 'List 'Number
-              , 'Number
-            :return $ :: 'List $ :: 'List (:: 'List 'Number)
+          :schema $ quote $ Fn
+            List $ List Number
+            , Number
+              -> $ List $ List (List Number)
       :ns $ %{} 'NsEntry (:doc |)
         :code $ quote $ ns app.math
     'app.updater $ %{} 'FileEntry
@@ -388,9 +351,8 @@
               :states $ update-states store op-data
               _ store
           :examples $ []
-          :schema $ :: 'Fn $ {}
-            :args $ [] (:: 'Map 'Tag 'Dynamic) 'Tag 'Dynamic
-            :return $ :: 'Map 'Tag 'Dynamic
+          :schema $ quote $ Fn (Map Tag Dynamic) Tag Dynamic
+            -> $ Map Tag Dynamic
       :ns $ %{} 'NsEntry (:doc |)
         :code $ quote $ ns app.updater
           :require $ quatrefoil.cursor :refer $ update-states

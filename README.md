@@ -1,23 +1,26 @@
-
 Play Lorenz Attractor
 ----
 
-> Based on [Quatrefoil](https://github.com/Quatrefoil-GL/quatrefoil).
+基于 Quatrefoil 的 Lorenz 吸引子可视化。
+Live demo: https://r.tiye.me/Quatrefoil-GL/play-lorenz-attractor/
+Video: https://www.bilibili.com/video/BV1Uw411d79p
 
-Live demo https://r.tiye.me/Quatrefoil-GL/play-lorenz-attractor/
+### 使用者影响
 
-Video demo https://www.bilibili.com/video/BV1Uw411d79p
+配对升级正式 Calcit CLI/procs 0.32.1、Quatrefoil 0.2.0、Quaternion 0.2.19、
+Touch Control 0.0.35、Pointed Prompt 0.0.24，传递 JS-FFI 0.2.9。
+类型标注通过官方 CLI 迁移；slice 终点按新合同以 Option :some 包装原值。
+Euler 方程、初始坐标、600000 点默认值、分段边界、相机和缩放均不变。
+`hud!` 页面报错与成功提示保留，没有改成 raise。
 
-### Workflow
+原 14 个项目定义中，仅 app.math/split-segments 的两处终点表达式变化；
+schema、元数据和原附带测试未变。native/JS 继续执行相同的五项数学断言，
+只将原共享 runner 对齐到已发布的 0.32.1，不新增验证框架或排除项。
 
-https://github.com/Quatrefoil-GL/quatrefoil-workflow
+### 开发与检查
 
-### Development and migration
-
-Use Calcit/procs 0.30.1, Caps 0.1.1, Node 24 and Yarn 4.18.0. Dependencies use
-published module tags, strict Caps resolution and immutable Yarn installation.
-Maintain calcit.cirru/deps.cirru; generated js-out is ignored. The old editor
-source and retired compact.cirru remain recoverable from Git history.
+使用 Caps 0.1.1、Node 24、Yarn 4.18.0，包龄明确为 60 分钟。
+维护 calcit.cirru/deps.cirru，不提交生成目录或 compact.cirru。
 
 ```sh
 caps --strict --ci
@@ -27,54 +30,22 @@ yarn compile
 yarn dev
 ```
 
-For live source compilation, run `calcit -w js` in a separate terminal.
+需要监听源码时另开终端运行 `calcit -w js`。
+完整 strict、208/208 定义、14/14 公开定义、工具链配对、immutable 安装和构建通过。
+原数学测试在 native/JS 各 1/1、无排除：首步缩放、第二步 Euler 数值、
+完整 600000 点数量、奇数分段尾部和重置 size。开放状态/派发类型仍保留，
+不声称完整类型闭合。
 
-Euler equations, initial coordinates and the original 600000-point default
-remain unchanged. Native replay passes initial steps, xyz scaling, reset
-configuration, odd-sized segment tails and the full original default count.
-The b control now writes b rather than the unused ab key, with a real browser
-parameter update and corresponding curve change verified.
+实际 IAB 验收保留原默认相机与规模：初始曲线极小，使用原 w 键靠近后可见
+完整双翼曲线，a 键改变视角，刷新恢复默认；控制台无警告/错误。
+桌面初始取景改进见 [issue #8](https://github.com/Quatrefoil-GL/play-lorenz-attractor/issues/8)，不借本轮类型迁移改变 VR 世界坐标。
+不宣称所有参数拖动、VR/gamepad、移动设备性能或跨 GPU 已验收。
 
-All 208 definitions and the complete strict gate pass. Mobile detection is an
-explicit JS binding with a declared host method and explicit host nullability;
-desktop/iPhone/iPad cases passed during the previous 0.29.3 migration. The current
-0.30.0 default application starts and refreshes without browser errors. Previous control tests
-used an ignored source copy with phone UA input and closer camera framing only;
-production scale/camera and point count were not changed. VR/gamepad and actual
-mobile hardware performance were not tested. Eight open type positions remain
-in five definitions; this is not a claim of complete type closure.
+VITE_BASE_URL 设置 CDN base，默认相对路径。COS v1.2.0 使用内置 public-base-url
+校验，无独立上传校验脚本；PR 前缀隔离，main 才使用原 rsync 路径。
+远端实际 Actions/COS 结果在 PR 记录，本地构建不代替部署验收。
 
-`VITE_BASE_URL` sets the CDN base, defaulting to relative assets. The workflow
-uses full gates and COS v1.2.0 built-in public-base-url verification, with no
-separate upload verifier. PR prefixes are isolated; only main uses the original
-rsync destination. Verify actual Actions/COS and production deployment before
-declaring deployment acceptance; local build results alone are insufficient.
-
-### 本轮使用者影响
-
-配对升级正式 Calcit/procs 0.30.1、Quatrefoil 0.1.10、Quaternion 0.2.16、
-Touch Control 0.0.32、Pointed Prompt 0.0.20；传递 JS FFI 为 0.2.5。
-上轮迁移的公开 Option 方法和显式 some/none 分支保留。
-Euler 方程、初始坐标、原 600000 点默认值、相机、分段和重置参数未改；
-`hud!` 的页面报错与成功提示也保留，没有改成 `raise`。
-
-纯数学函数与重置常量移至 `app.math`，与浏览器绘图库的导入隔离，函数体不变。
-原临时数学回放收为 `app.math/gen-lorenz-seq` 的一个定义附着测试，包含五个断言：
-首步缩放、第二步 Euler 数值、完整 600000 点数量、奇数分段尾部和重置 size。
-CI 复用 Calcit 0.30.1 已发布的 runner，在 native/JS 执行同一份测试，
-不另建验证脚本或框架；完整 strict 的失败状态/诊断会使 CI 失败。
-测试不代表 VR/gamepad、移动硬件性能或移动端参数拖动已经重新验收。
-COS 仅用 action 内建校验；PR 上传隔离前缀，原生产路径不变。
-
-### List 长度写法整理
-
-`split-segments` 的已声明 List 参数，以及原附带测试中 `gen-lorenz-seq`
-返回的 List，改用首选 `.len`。仅替换这两处计数调用头；Euler 公式、
-分段尾部、600000 点默认值、原五项断言、类型合同和 `hud!` 均保留。
-正式 Calcit/procs 0.30.1、模块版本、lock、质量门禁及部署路径不变。
-官方 Linux 准备 CI 在改写前后执行相同的完整 strict、原 native/JS 测试和构建，
-均通过；61 个生成 JS 文件的路径及逐文件 SHA256 完全一致。
-临时迁移脚本不进入项目，不代表新增 WebGL、VR、移动设备或性能验收。
+Workflow: https://github.com/Quatrefoil-GL/quatrefoil-workflow
 
 ### License
 
