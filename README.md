@@ -7,15 +7,23 @@ Video: https://www.bilibili.com/video/BV1Uw411d79p
 
 ### 使用者影响
 
-配对升级正式 Calcit CLI/procs 0.32.1、Quatrefoil 0.2.0、Quaternion 0.2.19、
-Touch Control 0.0.35、Pointed Prompt 0.0.24，传递 JS-FFI 0.2.9。
-类型标注通过官方 CLI 迁移；slice 终点按新合同以 Option :some 包装原值。
+配对升级正式 Calcit CLI/procs 0.34.2、Quatrefoil 0.3.0、Quaternion 0.2.19、
+Touch Control 0.0.36、Pointed Prompt 0.0.24，传递 JS-FFI 0.2.9。
+轨迹生成结果从任意长度的 List Number 明确为三坐标 Tuple；分段函数改为真正保留元素
+类型 T 的泛型，不限定输入必须为三维点，原单项列表分段调用继续支持。
 Euler 方程、初始坐标、600000 点默认值、分段边界、相机和缩放均不变。
 `hud!` 页面报错与成功提示保留，没有改成 raise。
 
-原 14 个项目定义中，仅 app.math/split-segments 的两处终点表达式变化；
-schema、元数据和原附带测试未变。native/JS 继续执行相同的五项数学断言，
-只将原共享 runner 对齐到已发布的 0.32.1，不新增验证框架或排除项。
+通过官方 CLI 迁移类型形式，除格式之外，14 个原定义中仅三个有预期改动：
+gen-lorenz-seq 的返回/循环合同及真实三项字面量标注、split-segments 的泛型合同及
+局部返回提示、组件中分段回调的 Tuple 元素合同。原测试和 FFI 元数据保持不变。
+共享 runner 对齐官方 0.34.2，native/JS 各执行原 1 项用例中的五个断言，无排除、无新框架。
+完整 600000 点计数、两步 Euler 数值、原单项列表分段尾部和重置 size 均通过。
+
+临时 Vite 内存检查使用真实 Three 和合成 32 点状态，两条各 16 点的线与原 Euler 输出一致，
+重置回调仍派发同一 cursor，恢复原 size=3000。模块初始化使用 div/键盘监听占位，
+记录 WebSocket 绑定限制和重复 Three 警告；不将它当作 DOM 命中、WebGL 绘制或控件交互验收。
+最终 PR CI/COS 结果待远端执行，本轮不合并或部署应用。
 
 ### 开发与检查
 
@@ -36,7 +44,7 @@ yarn dev
 完整 600000 点数量、奇数分段尾部和重置 size。开放状态/派发类型仍保留，
 不声称完整类型闭合。
 
-实际 IAB 验收保留原默认相机与规模：初始曲线极小，使用原 w 键靠近后可见
+此前 0.32.1 的实际 IAB 验收保留原默认相机与规模：初始曲线极小，使用原 w 键靠近后可见
 完整双翼曲线，a 键改变视角，刷新恢复默认；控制台无警告/错误。
 桌面初始取景改进见 [issue #8](https://github.com/Quatrefoil-GL/play-lorenz-attractor/issues/8)，不借本轮类型迁移改变 VR 世界坐标。
 不宣称所有参数拖动、VR/gamepad、移动设备性能或跨 GPU 已验收。

@@ -23,7 +23,7 @@
                 cursor $ quatrefoil.util.core/require-decoded $ try-decode-map-as
                     get states :cursor
                     , .unwrap
-                  :: 'List 'Tag
+                  quote $ List Tag
                 state $ quatrefoil.util.core/require-decoded $ try-decode-map-as
                   or
                     match (get states :data)
@@ -31,7 +31,7 @@
                       (:none) nil
                     {} (:a 10) (:b 28) (:size 600000) (:unit 0.006) (:scale 4)
                       :c $ / 8 3
-                  :: 'Map 'Tag 'Number
+                  quote $ Map Tag Number
                 a $
                   get state :a
                   , .unwrap
@@ -58,7 +58,7 @@
                   group ({}) & $ -> segments $ map-indexed
                     fn (idx segment)
                       hint-fn $ Fn Number
-                        List $ List Number
+                        List $ Tuple Number Number Number
                         -> quatrefoil.schema/Shape
                       line $ {} (:points segment)
                         :position $ [] 0 0 0
@@ -153,14 +153,15 @@
                 states $ quatrefoil.util.core/require-decoded $ try-decode-map-as
                     get store :states
                     , .unwrap
-                  :: 'Map 'Tag 'Dynamic
+                  quote $ Map Tag Dynamic
                 scaled 0.002
               scene ({})
                 group
                   {}
                     :scale $ [] scaled scaled scaled
                     :position $ [] 0 1.1 -0.4
-                  comp-lorenz-attractor $ quatrefoil.util.core/require-decoded $ try-decode-map-as (>> states :lorenz) (:: 'Map 'Tag 'Dynamic)
+                  comp-lorenz-attractor $ quatrefoil.util.core/require-decoded $ try-decode-map-as (>> states :lorenz)
+                    quote $ Map Tag Dynamic
                   ambient-light $ {} $ :color 0x666666
                   ; point-light $ {} (:color 0xffffff) (:intensity 1.4) (:distance 200)
                     :position $ [] 20 40 50
@@ -275,9 +276,9 @@
                 z 4
                 n steps
               hint-fn $ Fn
-                List $ List Number
+                List $ Tuple Number Number Number
                 , Number Number Number Number $ ->
-                  List $ List Number
+                  List $ Tuple Number Number Number
               ; println |trace x y z n
               if (&<= n 0) acc $ let
                   dx $ &* dt $ &* a (&- y x)
@@ -286,14 +287,16 @@
                     , y
                   dz $ &* dt $ &- (&* x y) (&* c z)
                 recur
-                  conj acc $ [] (&* x scale) (&* y scale) (&* z scale)
+                  conj acc $ assert-type
+                    [] (&* x scale) (&* y scale) (&* z scale)
+                    quote $ Tuple Number Number Number
                   &+ x dx
                   &+ y dy
                   &+ z dz
                   dec n
           :examples $ []
           :schema $ quote $ Fn Number Number Number Number Number Number
-            -> $ List $ List Number
+            -> $ List $ Tuple Number Number Number
           :tests $ [] $ %{} 'TestEntry (:name |preserve-euler-segments-and-default-count)
             :code $ quote $ do
               assert=
@@ -329,18 +332,16 @@
                 unit $ floor $ / size n
               -> (range n)
                 map $ fn (idx)
-                  hint-fn $ Fn Number $ ->
-                    List $ List Number
+                  hint-fn $ Fn Number $ -> (List T)
                   if
                     = (inc idx) n
                     slice points (* idx unit) (Option :some size)
                     slice points (* idx unit)
                       Option :some $ * (inc idx) unit
           :examples $ []
-          :schema $ quote $ Fn
-            List $ List Number
-            , Number
-              -> $ List $ List (List Number)
+          :schema $ quote $ Fn (List T) Number
+            -> $ List $ List T
+            :generics T
       :ns $ %{} 'NsEntry (:doc |)
         :code $ quote $ ns app.math
     'app.updater $ %{} 'FileEntry
