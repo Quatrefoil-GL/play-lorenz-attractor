@@ -23,15 +23,16 @@
                 cursor $ quatrefoil.util.core/require-decoded $ try-decode-map-as
                     get states :cursor
                     , .unwrap
-                  quote $ List Tag
+                  List Tag
                 state $ quatrefoil.util.core/require-decoded $ try-decode-map-as
-                  or
-                    match (get states :data)
-                      (:some found) found
-                      (:none) nil
-                    {} (:a 10) (:b 28) (:size 600000) (:unit 0.006) (:scale 4)
-                      :c $ / 8 3
-                  quote $ Map Tag Number
+                  match (get states :data)
+                    (:some found)
+                      or found $ {} (:a 10) (:b 28) (:size 600000) (:unit 0.006) (:scale 4)
+                        :c $ / 8 3
+                    (:none)
+                      {} (:a 10) (:b 28) (:size 600000) (:unit 0.006) (:scale 4)
+                        :c $ / 8 3
+                  Map Tag Number
                 a $
                   get state :a
                   , .unwrap
@@ -76,7 +77,7 @@
                       :bound $ [] 10 800000
                     fn (v d!)
                       hint-fn $ Fn Number
-                        Fn Dynamic Dynamic $ -> Unit
+                        Fn (List Tag) (Map Tag Number) (-> Unit)
                         -> Unit
                       d! cursor $ assoc state :size v
                   comp-value
@@ -85,7 +86,7 @@
                       :bound $ [] 0.00001 1
                     fn (v d!)
                       hint-fn $ Fn Number
-                        Fn Dynamic Dynamic $ -> Unit
+                        Fn (List Tag) (Map Tag Number) (-> Unit)
                         -> Unit
                       d! cursor $ assoc state :unit v
                   comp-value
@@ -94,7 +95,7 @@
                       :bound $ [] 0.1 10
                     fn (v d!)
                       hint-fn $ Fn Number
-                        Fn Dynamic Dynamic $ -> Unit
+                        Fn (List Tag) (Map Tag Number) (-> Unit)
                         -> Unit
                       d! cursor $ assoc state :scale v
                   comp-value
@@ -103,7 +104,7 @@
                       :bound $ [] -100 100
                     fn (v d!)
                       hint-fn $ Fn Number
-                        Fn Dynamic Dynamic $ -> Unit
+                        Fn (List Tag) (Map Tag Number) (-> Unit)
                         -> Unit
                       d! cursor $ assoc state :a v
                   comp-value
@@ -112,7 +113,7 @@
                       :bound $ [] -100 100
                     fn (v d!)
                       hint-fn $ Fn Number
-                        Fn Dynamic Dynamic $ -> Unit
+                        Fn (List Tag) (Map Tag Number) (-> Unit)
                         -> Unit
                       d! cursor $ assoc state :b v
                   comp-value
@@ -121,7 +122,7 @@
                       :bound $ [] -100 100
                     fn (v d!)
                       hint-fn $ Fn Number
-                        Fn Dynamic Dynamic $ -> Unit
+                        Fn (List Tag) (Map Tag Number) (-> Unit)
                         -> Unit
                       d! cursor $ assoc state :c v
                   sphere $ {} (:radius 1) (:emissive 0xffffff) (:color 0xff0000) (:emissiveIntensity 1)
@@ -130,7 +131,7 @@
                     :event $ {} $ :click
                       fn (e d!)
                         hint-fn $ Fn Dynamic
-                          Fn Dynamic Dynamic $ -> Unit
+                          Fn (List Tag) (Map Tag Number) (-> Unit)
                           -> Unit
                         d! cursor $ merge state initial-config
                 ambient-light $ {} $ :color 0x444422
@@ -153,15 +154,14 @@
                 states $ quatrefoil.util.core/require-decoded $ try-decode-map-as
                     get store :states
                     , .unwrap
-                  quote $ Map Tag Dynamic
+                  Map Tag Dynamic
                 scaled 0.002
               scene ({})
                 group
                   {}
                     :scale $ [] scaled scaled scaled
                     :position $ [] 0 1.1 -0.4
-                  comp-lorenz-attractor $ quatrefoil.util.core/require-decoded $ try-decode-map-as (>> states :lorenz)
-                    quote $ Map Tag Dynamic
+                  comp-lorenz-attractor $ quatrefoil.util.core/require-decoded $ try-decode-map-as (>> states :lorenz) (Map Tag Dynamic)
                   ambient-light $ {} $ :color 0x666666
                   ; point-light $ {} (:color 0xffffff) (:intensity 1.4) (:distance 200)
                     :position $ [] 20 40 50
@@ -185,7 +185,7 @@
           :schema $ quote $ Ref (Map Tag Dynamic)
         'MobileDetectorHost $ %{} 'CodeEntry (:doc |)
           :code $ quote $ deftrait MobileDetectorHost
-            .mobile $ quote $ Fn app.main/MobileDetectorHost
+            .mobile $ Fn app.main/MobileDetectorHost
               -> $ JsNullish JsObject
               :features :js-ffi
           :examples $ []
@@ -289,7 +289,7 @@
                 recur
                   conj acc $ assert-type
                     [] (&* x scale) (&* y scale) (&* z scale)
-                    quote $ Tuple Number Number Number
+                    Tuple Number Number Number
                   &+ x dx
                   &+ y dy
                   &+ z dz
