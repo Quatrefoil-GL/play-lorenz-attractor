@@ -18,39 +18,15 @@
           :examples $ []
           :schema $ quote $ List Number
         'comp-lorenz-attractor $ %{} 'CodeEntry (:doc |)
-          :code $ quote $ defcomp comp-lorenz-attractor (states)
+          :code $ quote $ defcomp comp-lorenz-attractor (state)
             let
-                cursor $ quatrefoil.util.core/require-decoded $ try-decode-map-as
-                    get states :cursor
-                    , .unwrap
-                  List Tag
-                state $ quatrefoil.util.core/require-decoded $ try-decode-map-as
-                  match (get states :data)
-                    (:some found)
-                      or found $ {} (:a 10) (:b 28) (:size 600000) (:unit 0.006) (:scale 4)
-                        :c $ / 8 3
-                    (:none)
-                      {} (:a 10) (:b 28) (:size 600000) (:unit 0.006) (:scale 4)
-                        :c $ / 8 3
-                  Map Tag Number
-                a $
-                  get state :a
-                  , .unwrap
-                b $
-                  get state :b
-                  , .unwrap
-                c $
-                  get state :c
-                  , .unwrap
-                size $
-                  get state :size
-                  , .unwrap
-                unit $
-                  get state :unit
-                  , .unwrap
-                scale $
-                  get state :scale
-                  , .unwrap
+                cursor app.updater/lorenz-cursor
+                a $ :a state
+                b $ :b state
+                c $ :c state
+                size $ :size state
+                unit $ :unit state
+                scale $ :scale state
               group ({})
                 let
                     n 8
@@ -77,112 +53,106 @@
                       :bound $ [] 10 800000
                     fn (v d!)
                       hint-fn $ Fn Number
-                        Fn (List Tag) (Map Tag Number) (-> Unit)
+                        Fn (List Tag) app.updater/LorenzState $ -> Unit
                         -> Unit
-                      d! cursor $ assoc state :size v
+                      d! cursor $ &struct:assoc state :size v
                   comp-value
                     {} (:radius 1) (:speed 0.0001) (:color 0xffaa99) (:show-text? true) (:opacity 0.8) (:label |unit) (:fract-length 5) (:value unit)
                       :position $ [] 10 15 160
                       :bound $ [] 0.00001 1
                     fn (v d!)
                       hint-fn $ Fn Number
-                        Fn (List Tag) (Map Tag Number) (-> Unit)
+                        Fn (List Tag) app.updater/LorenzState $ -> Unit
                         -> Unit
-                      d! cursor $ assoc state :unit v
+                      d! cursor $ &struct:assoc state :unit v
                   comp-value
                     {} (:radius 1) (:speed 0.1) (:color 0xec8afa) (:show-text? true) (:opacity 0.8) (:label |scale) (:fract-length 5) (:value scale)
                       :position $ [] 10 10 160
                       :bound $ [] 0.1 10
                     fn (v d!)
                       hint-fn $ Fn Number
-                        Fn (List Tag) (Map Tag Number) (-> Unit)
+                        Fn (List Tag) app.updater/LorenzState $ -> Unit
                         -> Unit
-                      d! cursor $ assoc state :scale v
+                      d! cursor $ &struct:assoc state :scale v
                   comp-value
                     {} (:radius 1) (:speed 0.5) (:color 0xaaaaff) (:show-text? true) (:opacity 0.8) (:label |a) (:fract-length 5) (:value a)
                       :position $ [] 20 5 160
                       :bound $ [] -100 100
                     fn (v d!)
                       hint-fn $ Fn Number
-                        Fn (List Tag) (Map Tag Number) (-> Unit)
+                        Fn (List Tag) app.updater/LorenzState $ -> Unit
                         -> Unit
-                      d! cursor $ assoc state :a v
+                      d! cursor $ &struct:assoc state :a v
                   comp-value
                     {} (:radius 1) (:speed 0.5) (:color 0xaaaaff) (:show-text? true) (:opacity 0.8) (:label |b) (:fract-length 5) (:value b)
                       :position $ [] 20 0 160
                       :bound $ [] -100 100
                     fn (v d!)
                       hint-fn $ Fn Number
-                        Fn (List Tag) (Map Tag Number) (-> Unit)
+                        Fn (List Tag) app.updater/LorenzState $ -> Unit
                         -> Unit
-                      d! cursor $ assoc state :b v
+                      d! cursor $ &struct:assoc state :b v
                   comp-value
                     {} (:radius 1) (:speed 0.5) (:color 0xaaaaff) (:show-text? true) (:opacity 0.8) (:label |c) (:fract-length 5) (:value c)
                       :position $ [] 20 -5 160
                       :bound $ [] -100 100
                     fn (v d!)
                       hint-fn $ Fn Number
-                        Fn (List Tag) (Map Tag Number) (-> Unit)
+                        Fn (List Tag) app.updater/LorenzState $ -> Unit
                         -> Unit
-                      d! cursor $ assoc state :c v
+                      d! cursor $ &struct:assoc state :c v
                   sphere $ {} (:radius 1) (:emissive 0xffffff) (:color 0xff0000) (:emissiveIntensity 1)
                     :position $ [] 50 4 160
                     :material $ {} (:kind :mesh-basic) (:color 0xff0000) (:opacity 1) (:transparent true)
                     :event $ {} $ :click
-                      fn (e d!)
-                        hint-fn $ Fn Dynamic
-                          Fn (List Tag) (Map Tag Number) (-> Unit)
+                      fn (_event d!)
+                        hint-fn $ Fn JsObject
+                          Fn (List Tag) app.updater/LorenzState $ -> Unit
                           -> Unit
-                        d! cursor $ merge state initial-config
+                        d! cursor app.updater/reset-state
                 ambient-light $ {} $ :color 0x444422
                 point-light $ {} (:color 0xffffff) (:intensity 2) (:distance 200)
                   :position $ [] 0 60 0
           :examples $ []
-          :schema $ quote $ Fn (Map Tag Dynamic) (-> quatrefoil.schema/Component)
+          :schema $ quote $ Fn app.updater/LorenzState (-> quatrefoil.schema/Component)
       :ns $ %{} 'NsEntry (:doc |)
         :code $ quote $ ns app.como.lorenz-attractor
           :require
             quatrefoil.alias :refer $ group sphere line ambient-light point-light
             quatrefoil.core :refer $ defcomp hslx
             quatrefoil.comp.control :refer $ comp-value
-            app.math :refer $ gen-lorenz-seq split-segments initial-config
+            app.math :refer $ gen-lorenz-seq split-segments
     'app.comp.container $ %{} 'FileEntry
       :defs $ {} $ 'comp-container
         %{} 'CodeEntry (:doc |)
           :code $ quote $ defcomp comp-container (store)
             let
-                states $ quatrefoil.util.core/require-decoded $ try-decode-map-as
-                    get store :states
-                    , .unwrap
-                  Map Tag Dynamic
                 scaled 0.002
               scene ({})
                 group
                   {}
                     :scale $ [] scaled scaled scaled
                     :position $ [] 0 1.1 -0.4
-                  comp-lorenz-attractor $ quatrefoil.util.core/require-decoded $ try-decode-map-as (>> states :lorenz) (Map Tag Dynamic)
+                  comp-lorenz-attractor store
                   ambient-light $ {} $ :color 0x666666
                   ; point-light $ {} (:color 0xffffff) (:intensity 1.4) (:distance 200)
                     :position $ [] 20 40 50
                   ; point-light $ {} (:color 0xffffff) (:intensity 2) (:distance 200)
                     :position $ [] 0 60 0
           :examples $ []
-          :schema $ quote $ Fn (Map Tag Dynamic) (-> quatrefoil.schema/Component)
+          :schema $ quote $ Fn app.updater/LorenzState (-> quatrefoil.schema/Component)
       :ns $ %{} 'NsEntry (:doc |)
         :code $ quote $ ns app.comp.container
           :require
             quatrefoil.alias :refer $ group box sphere point-light ambient-light scene text
-            quatrefoil.core :refer $ defcomp >>
+            quatrefoil.core :refer $ defcomp
             app.como.lorenz-attractor :refer $ comp-lorenz-attractor
     'app.main $ %{} 'FileEntry
       :defs $ {}
         '*store $ %{} 'CodeEntry (:doc |)
-          :code $ quote $ defref *store
-            {} $ :states $ {}
-              :cursor $ []
+          :code $ quote $ defref *store app.updater/default-state
           :examples $ []
-          :schema $ quote $ Ref (Map Tag Dynamic)
+          :schema $ quote $ Ref app.updater/LorenzState
         'MobileDetectorHost $ %{} 'CodeEntry (:doc |)
           :code $ quote $ deftrait MobileDetectorHost
             .mobile $ Fn app.main/MobileDetectorHost
@@ -194,16 +164,20 @@
         'dispatch! $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defn dispatch! (op op-data)
             if (list? op)
-              recur :states $ [] op op-data
               let
-                  store $ updater @*store
-                    quatrefoil.util.core/require-decoded $ try-decode-map-as op 'Tag
-                    , op-data
-                ; js/console.log |Dispatch: op op-data store
-                reset! *store store
-                , &unit
+                  cursor $ decode-map-as op $ List Tag
+                reset! *store $ updater @*store cursor op-data
+              when
+                = (decode-map-as op 'Tag) :states
+                let
+                    pair $ decode-map-as op-data $ List Dynamic
+                    cursor $ decode-map-as
+                      .unwrap $ nth pair 0
+                      List Tag
+                  reset! *store $ updater @*store cursor $ .unwrap (nth pair 1)
+            , &unit
           :examples $ []
-          :schema $ quote $ Fn Dynamic Dynamic (-> Unit)
+          :schema $ quote $ Fn Op Payload (-> Unit) (:generics Op Payload)
         'main! $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defn main! () (load-console-formatter!) (inject-tree-methods)
             set-perspective-camera! $ {} (:fov 45) (:near 0.1) (:far 1000)
@@ -345,15 +319,53 @@
       :ns $ %{} 'NsEntry (:doc |)
         :code $ quote $ ns app.math
     'app.updater $ %{} 'FileEntry
-      :defs $ {} $ 'updater
-        %{} 'CodeEntry (:doc |)
-          :code $ quote $ defn updater (store op op-data)
-            match op
-              :states $ update-states store op-data
-              _ store
+      :defs $ {}
+        'LorenzPayload $ %{} 'CodeEntry
+          :doc "|Current scene parameters or the legacy numeric Map."
+          :code $ quote $ defunion LorenzPayload LorenzState (Map Tag Number)
           :examples $ []
-          :schema $ quote $ Fn (Map Tag Dynamic) Tag Dynamic
-            -> $ Map Tag Dynamic
+          :schema $ quote UnionDef
+        'LorenzState $ %{} 'CodeEntry (:doc |)
+          :code $ quote $ defstruct LorenzState (:a Number) (:b Number) (:c Number) (:size Number) (:unit Number) (:scale Number)
+          :examples $ []
+          :schema $ quote StructDef
+        'default-state $ %{} 'CodeEntry (:doc |)
+          :code $ quote $ def default-state
+            &struct:assoc (&struct:assoc reset-state :size 600000) :scale 4
+          :examples $ []
+          :schema $ quote app.updater/LorenzState
+        'lorenz-cursor $ %{} 'CodeEntry (:doc |)
+          :code $ quote $ def lorenz-cursor ([] :lorenz)
+          :examples $ []
+          :schema $ quote $ List Tag
+        'read-state $ %{} 'CodeEntry (:doc |)
+          :code $ quote $ defn read-state (raw)
+            match (decode-map-as raw LorenzPayload)
+              (Map fields)
+                LorenzState :a
+                  .unwrap $ get fields :a
+                  , :b
+                    .unwrap $ get fields :b
+                    , :c
+                      .unwrap $ get fields :c
+                      , :size
+                        .unwrap $ get fields :size
+                        , :unit
+                          .unwrap $ get fields :unit
+                          , :scale $ .unwrap $ get fields :scale
+              (LorenzState checked) checked
+          :examples $ []
+          :schema $ quote $ Fn Raw (-> app.updater/LorenzState) (:generics Raw)
+        'reset-state $ %{} 'CodeEntry (:doc |)
+          :code $ quote $ def reset-state (read-state app.math/initial-config)
+          :examples $ []
+          :schema $ quote app.updater/LorenzState
+        'updater $ %{} 'CodeEntry (:doc |)
+          :code $ quote $ defn updater (store cursor raw)
+            if (= cursor lorenz-cursor)
+              if (not raw) default-state $ read-state raw
+              , store
+          :examples $ []
+          :schema $ quote $ Fn app.updater/LorenzState (List Tag) Raw (-> app.updater/LorenzState) (:generics Raw)
       :ns $ %{} 'NsEntry (:doc |)
         :code $ quote $ ns app.updater
-          :require $ quatrefoil.cursor :refer $ update-states
