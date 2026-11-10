@@ -163,19 +163,25 @@
           :schema $ quote Trait
         'dispatch! $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defn dispatch! (op op-data)
-            if (list? op)
-              let
-                  cursor $ decode-map-as op $ List Tag
-                reset! *store $ updater @*store cursor op-data
-              when
-                = (decode-map-as op 'Tag) :states
-                let
-                    pair $ decode-map-as op-data $ List Dynamic
-                    cursor $ decode-map-as
-                      .unwrap $ nth pair 0
-                      List Tag
-                  reset! *store $ updater @*store cursor $ .unwrap (nth pair 1)
-            , &unit
+            let
+                pair $ if (list? op)
+                  Option :some $ [] op op-data
+                  if
+                    = (decode-map-as op Tag) :states
+                    Option :some $ decode-map-as op-data $ List Dynamic
+                    Option :none
+              match pair
+                (:some args)
+                  let
+                      cursor $ decode-map-as
+                        .unwrap $ nth args 0
+                        List Tag
+                      raw $ .unwrap $ nth args 1
+                    reset! *store $ if (= cursor app.updater/lorenz-cursor)
+                      if (not raw) app.updater/default-state $ app.updater/read-state $ decode-map-as raw app.updater/LorenzPayload
+                      , @*store
+                (:none) &unit
+              , &unit
           :examples $ []
           :schema $ quote $ Fn Op Payload (-> Unit) (:generics Op Payload)
         'main! $ %{} 'CodeEntry (:doc |)
@@ -232,7 +238,6 @@
             |@quatrefoil/utils :refer $ inject-tree-methods
             quatrefoil.core :refer $ render-canvas! *global-tree clear-cache! init-renderer! init-controls! handle-key-event handle-control-events
             app.comp.container :refer $ comp-container
-            app.updater :refer $ updater
             |three :as THREE
             touch-control.core :refer $ render-control! start-control-loop! clear-control-loop!
             |mobile-detect :default mobile-detect
@@ -340,7 +345,7 @@
           :schema $ quote $ List Tag
         'read-state $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defn read-state (raw)
-            match (decode-map-as raw LorenzPayload)
+            match raw
               (Map fields)
                 LorenzState :a
                   .unwrap $ get fields :a
@@ -355,17 +360,10 @@
                           , :scale $ .unwrap $ get fields :scale
               (LorenzState checked) checked
           :examples $ []
-          :schema $ quote $ Fn Raw (-> app.updater/LorenzState) (:generics Raw)
+          :schema $ quote $ Fn app.updater/LorenzPayload (-> app.updater/LorenzState)
         'reset-state $ %{} 'CodeEntry (:doc |)
           :code $ quote $ def reset-state (read-state app.math/initial-config)
           :examples $ []
           :schema $ quote app.updater/LorenzState
-        'updater $ %{} 'CodeEntry (:doc |)
-          :code $ quote $ defn updater (store cursor raw)
-            if (= cursor lorenz-cursor)
-              if (not raw) default-state $ read-state raw
-              , store
-          :examples $ []
-          :schema $ quote $ Fn app.updater/LorenzState (List Tag) Raw (-> app.updater/LorenzState) (:generics Raw)
       :ns $ %{} 'NsEntry (:doc |)
         :code $ quote $ ns app.updater
