@@ -1,6 +1,6 @@
 
 {}
-  :calcit-version |0.41.0
+  :calcit-version |0.41.1
   :version |0.0.4
   :dependencies $ {}
     |calcit-lang/quaternion |0.2.23

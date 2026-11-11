@@ -170,12 +170,8 @@
               when
                 = (decode-map-as op Tag) :states
                 let
-                    args $ decode-map-as op-data $ List Dynamic
-                    cursor $ decode-map-as
-                      .unwrap $ nth args 0
-                      List Tag
-                    raw $ .unwrap $ nth args 1
-                  dispatch-state! cursor raw
+                    args $ decode-map-as op-data $ Tuple (List Tag) Dynamic
+                  let[] (cursor raw) args $ dispatch-state! cursor raw
             , &unit
           :examples $ []
           :schema $ quote $ Fn Op Payload (-> Unit) (:generics Op Payload)

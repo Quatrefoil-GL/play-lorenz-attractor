@@ -5,9 +5,9 @@ Play Lorenz Attractor
 Live demo: https://r.tiye.me/Quatrefoil-GL/play-lorenz-attractor/
 Video: https://www.bilibili.com/video/BV1Uw411d79p
 
-### Calcit 0.41.0 使用说明
+### Calcit 0.41.1 使用说明
 
-升级时配套使用正式 Calcit 与 `@calcit/procs` 0.41.0，重新安装依赖并构建。
+升级时配套使用正式 Calcit 与 `@calcit/procs` 0.41.1，重新安装依赖并构建。
 本地开发若保留旧热重载会话，请刷新页面以重建状态。
 首次载入仍使用 600000 点和缩放 4，点击重置仍使用 3000 点和缩放 1。
 
