@@ -163,27 +163,30 @@
           :schema $ quote Trait
         'dispatch! $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defn dispatch! (op op-data)
-            let
-                pair $ if (list? op)
-                  Option :some $ [] op op-data
-                  if
-                    = (decode-map-as op Tag) :states
-                    Option :some $ decode-map-as op-data $ List Dynamic
-                    Option :none
-              match pair
-                (:some args)
-                  let
-                      cursor $ decode-map-as
-                        .unwrap $ nth args 0
-                        List Tag
-                      raw $ .unwrap $ nth args 1
-                    reset! *store $ if (= cursor app.updater/lorenz-cursor)
-                      if (not raw) app.updater/default-state $ app.updater/read-state $ decode-map-as raw app.updater/LorenzPayload
-                      , @*store
-                (:none) &unit
-              , &unit
+            if (list? op)
+              dispatch-state!
+                decode-map-as op $ List Tag
+                , op-data
+              when
+                = (decode-map-as op Tag) :states
+                let
+                    args $ decode-map-as op-data $ List Dynamic
+                    cursor $ decode-map-as
+                      .unwrap $ nth args 0
+                      List Tag
+                    raw $ .unwrap $ nth args 1
+                  dispatch-state! cursor raw
+            , &unit
           :examples $ []
           :schema $ quote $ Fn Op Payload (-> Unit) (:generics Op Payload)
+        'dispatch-state! $ %{} 'CodeEntry (:doc |)
+          :code $ quote $ defn dispatch-state! (cursor raw)
+            reset! *store $ if (= cursor app.updater/lorenz-cursor)
+              if (not raw) app.updater/default-state $ app.updater/read-state $ decode-map-as raw app.updater/LorenzPayload
+              , @*store
+            , &unit
+          :examples $ []
+          :schema $ quote $ Fn (List Tag) Raw (-> Unit) (:generics Raw)
         'main! $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defn main! () (load-console-formatter!) (inject-tree-methods)
             set-perspective-camera! $ {} (:fov 45) (:near 0.1) (:far 1000)
@@ -314,9 +317,9 @@
                   hint-fn $ Fn Number $ -> (List T)
                   if
                     = (inc idx) n
-                    slice points (* idx unit) (Option :some size)
+                    slice points (* idx unit) (Some size)
                     slice points (* idx unit)
-                      Option :some $ * (inc idx) unit
+                      Some $ * (inc idx) unit
           :examples $ []
           :schema $ quote $ Fn (List T) Number
             -> $ List $ List T
@@ -338,7 +341,7 @@
           :code $ quote $ def default-state
             &struct:assoc (&struct:assoc reset-state :size 600000) :scale 4
           :examples $ []
-          :schema $ quote app.updater/LorenzState
+          :schema $ quote LorenzState
         'lorenz-cursor $ %{} 'CodeEntry (:doc |)
           :code $ quote $ def lorenz-cursor ([] :lorenz)
           :examples $ []
@@ -360,10 +363,10 @@
                           , :scale $ .unwrap $ get fields :scale
               (LorenzState checked) checked
           :examples $ []
-          :schema $ quote $ Fn app.updater/LorenzPayload (-> app.updater/LorenzState)
+          :schema $ quote $ Fn LorenzPayload (-> LorenzState)
         'reset-state $ %{} 'CodeEntry (:doc |)
           :code $ quote $ def reset-state (read-state app.math/initial-config)
           :examples $ []
-          :schema $ quote app.updater/LorenzState
+          :schema $ quote LorenzState
       :ns $ %{} 'NsEntry (:doc |)
         :code $ quote $ ns app.updater
