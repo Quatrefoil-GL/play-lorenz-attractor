@@ -176,7 +176,7 @@
                     let[] (cursor raw) args $ dispatch-state! cursor raw
             , &unit
           :examples $ []
-          :schema $ quote $ Fn Op Payload (-> Unit) (:generics Op Payload)
+          :schema $ quote $ Fn Op Payload (-> Unit) (:generics Op Payload) (:features :state)
         'dispatch-state! $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defn dispatch-state! (cursor raw)
             reset! *store $ if (= cursor app.updater/lorenz-cursor)
@@ -184,7 +184,7 @@
               , @*store
             , &unit
           :examples $ []
-          :schema $ quote $ Fn (List Tag) Raw (-> Unit) (:generics Raw)
+          :schema $ quote $ Fn (List Tag) Raw (-> Unit) (:generics Raw) (:features :state)
         'main! $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defn main! () (load-console-formatter!) (inject-tree-methods)
             set-perspective-camera! $ {} (:fov 45) (:near 0.1) (:far 1000)
@@ -204,7 +204,7 @@
             println "|App started!"
             , &unit
           :examples $ []
-          :schema $ quote $ Fn (-> Unit) (:features :js-ffi)
+          :schema $ quote $ Fn (-> Unit) (:features :io :js-ffi :state)
         'mobile? $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defn mobile? (user-agent)
             let
@@ -227,12 +227,12 @@
                 println "|Code updated."
             , &unit
           :examples $ []
-          :schema $ quote $ Fn (-> Unit) (:features :js-ffi)
+          :schema $ quote $ Fn (-> Unit) (:features :io :js-ffi :state)
         'render-app! $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defn render-app! () (; println "|Render app:")
             render-canvas! (comp-container @*store) dispatch!
           :examples $ []
-          :schema $ quote $ Fn (-> Unit) (:features :js-ffi)
+          :schema $ quote $ Fn (-> Unit) (:features :js-ffi :state)
       :ns $ %{} 'NsEntry (:doc |)
         :code $ quote $ ns app.main
           :require
