@@ -153,6 +153,10 @@
           :code $ quote $ defref *store app.updater/default-state
           :examples $ []
           :schema $ quote $ Ref app.updater/LorenzState
+        'DispatchKey $ %{} 'CodeEntry (:doc |)
+          :code $ quote $ defunion DispatchKey Tag (List Tag)
+          :examples $ []
+          :schema $ quote UnionDef
         'MobileDetectorHost $ %{} 'CodeEntry (:doc |)
           :code $ quote $ deftrait MobileDetectorHost
             .mobile $ Fn app.main/MobileDetectorHost
@@ -163,15 +167,13 @@
           :schema $ quote Trait
         'dispatch! $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defn dispatch! (op op-data)
-            if (list? op)
-              dispatch-state!
-                decode-map-as op $ List Tag
-                , op-data
-              when
-                = (decode-map-as op Tag) :states
-                let
-                    args $ decode-map-as op-data $ Tuple (List Tag) Dynamic
-                  let[] (cursor raw) args $ dispatch-state! cursor raw
+            match (decode-map-as op DispatchKey)
+              (List cursor) (dispatch-state! cursor op-data)
+              (Tag action)
+                when (= action :states)
+                  let
+                      args $ decode-map-as op-data $ Tuple (List Tag) Dynamic
+                    let[] (cursor raw) args $ dispatch-state! cursor raw
             , &unit
           :examples $ []
           :schema $ quote $ Fn Op Payload (-> Unit) (:generics Op Payload)
