@@ -5,10 +5,12 @@ Play Lorenz Attractor
 Live demo: https://r.tiye.me/Quatrefoil-GL/play-lorenz-attractor/
 Video: https://www.bilibili.com/video/BV1Uw411d79p
 
-### Calcit 0.44.0 使用说明
+### Calcit 0.45.1 使用说明
 
-升级时配套使用正式 Calcit 与 `@calcit/procs` 0.44.0，重新安装依赖并构建。
+升级时配套使用正式 Calcit 与 `@calcit/procs` 0.45.1，重新安装依赖并构建。
 本地开发若保留旧热重载会话，请刷新页面以重建状态。
+依赖配套 Quatrefoil 0.3.9、Quaternion 0.2.27、Touch Control 0.0.45 和 Pointed Prompt 0.0.32。
+240 个定义的严格检查、原数学用例的 native/JS 双端重放和构建通过；本轮未复验实际 WebGL 交互。
 首次载入仍使用 600000 点和缩放 4，点击重置仍使用 3000 点和缩放 1。
 
 场景参数由六个数值字段组成。直接游标和旧 `:states` pair 仍可传入旧数值 Map，
