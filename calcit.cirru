@@ -180,7 +180,9 @@
         'dispatch-state! $ %{} 'CodeEntry (:doc |)
           :code $ quote $ defn dispatch-state! (cursor raw)
             reset! *store $ if (= cursor app.updater/lorenz-cursor)
-              if (not raw) app.updater/default-state $ app.updater/read-state $ decode-map-as raw app.updater/LorenzPayload
+              if
+                if (bool? raw) (not raw) (nil? raw)
+                , app.updater/default-state $ app.updater/read-state $ decode-map-as raw app.updater/LorenzPayload
               , @*store
             , &unit
           :examples $ []
